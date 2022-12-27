@@ -27,7 +27,11 @@ class Bot:
 
     def get_help(self) -> str:
         self.write_history('help')
-        return 'Help'
+        return '/game_rating - рейтинг игр.\n' \
+               '/history - история команд\n' \
+               '/low - установить минимальный рейтинг.\n' \
+               '/high - установить максимальный рейтинг.\n' \
+               '/custom - установить диапазон рейтинга.'
 
     def set_low(self) -> str:
         self.write_history('low')

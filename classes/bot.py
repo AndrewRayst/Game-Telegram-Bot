@@ -3,6 +3,7 @@ from typing import List
 
 from aiogram import Bot as AIOBot, Dispatcher, executor, types
 
+from classes.api import API
 from classes.keyboard import KeyBoard
 
 from utils.emoji import emojize
@@ -19,6 +20,7 @@ class Bot:
         self.__aioBot = AIOBot(token=os.getenv('BOT_TOKEN'))
         self.__dispatcher = Dispatcher(self.__aioBot)
         self.__keyboard = KeyBoard(self, self.__dispatcher)
+        self.__api = API()
 
     def start(self) -> str:
         self.write_history('start')
@@ -56,7 +58,13 @@ class Bot:
 
     def get_game_rating(self) -> str:
         self.write_history('game_rating')
-        return 'Mafia: 7\nGod of war: 9'
+        data = self.__api.get()
+
+        if data:
+            print(list([(i_item['name'], i_item['topCriticScore']) for i_item in data]))
+            return 'rating'
+
+        return 'Ошибка соединения'
 
     def watch_command(self) -> None:
         @self.__dispatcher.message_handler(commands=self.__bot_commands)

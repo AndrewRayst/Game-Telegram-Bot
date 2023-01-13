@@ -1,7 +1,7 @@
-from aiogram import Dispatcher, types
+from aiogram import Dispatcher
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 
-from utils.emoji import demojize, emojize
+from utils.emoji import emojize
 
 
 class KeyBoard:
@@ -33,32 +33,3 @@ class KeyBoard:
 
     def remove(self) -> None:
         ReplyKeyboardRemove()
-
-    def watch_keyboard(self) -> None:
-        @self.__dispatcher.message_handler()
-        async def keyboard_command(msg: types.Message) -> None:
-            match demojize(msg.text):
-                case ':gear:':
-                    await msg.answer(self.__bot.settings(), reply_markup=self.get_settings())
-
-                case ':left_arrow:':
-                    new_msg = 'выбери команду ниже ' + emojize(':backhand_index_pointing_down:')
-                    await msg.answer(text=new_msg, reply_markup=self.get_main())
-
-                case 'Help':
-                    await msg.answer(self.__bot.get_help())
-
-                case 'History':
-                    await msg.answer(self.__bot.get_history())
-
-                case 'Game Rating':
-                    await msg.answer(self.__bot.get_game_rating())
-
-                case 'Low':
-                    await msg.answer(self.__bot.set_low())
-
-                case 'High':
-                    await msg.answer(self.__bot.set_high())
-
-                case 'Custom':
-                    await msg.answer(self.__bot.set_custom())

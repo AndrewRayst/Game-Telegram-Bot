@@ -30,7 +30,7 @@ class Watcher:
                 case '/game_rating':
                     await msg.answer(self.bot.get_game_rating(user_id))
                 case '/history':
-                    await msg.answer(self.bot.get_history(user_id))
+                    await msg.answer(self.bot.get_history(user_id), parse_mode=types.ParseMode.HTML)
                 case '/settings':
                     new_msg = 'Настройки ' + emojize(':backhand_index_pointing_down:')
                     await msg.answer(new_msg, reply_markup=self.bot.keyboard.get_settings())
@@ -56,7 +56,7 @@ class Watcher:
                     await msg.answer(self.bot.get_help(user_id))
 
                 case 'History':
-                    await msg.answer(self.bot.get_history(user_id))
+                    await msg.answer(self.bot.get_history(user_id), parse_mode=types.ParseMode.HTML)
 
                 case 'Game Rating':
                     await msg.answer(self.bot.get_game_rating(user_id))

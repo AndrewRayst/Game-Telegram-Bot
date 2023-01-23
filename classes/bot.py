@@ -48,7 +48,7 @@ class Bot:
                '/high - установить максимальный рейтинг.\n' \
                '/custom - установить диапазон рейтинга.'
 
-    def set_custom(self, user_id: int, limit_low: T_limit, limit_high: T_limit) -> str:
+    def set_custom(self, user_id: int, limit_low: T_limit, limit_high: T_limit) -> None:
         self.__db.write_history(user_id=user_id, query_name='custom')
         self.__db.set_custom(user_id=user_id, low_limit=limit_low, high_limit=limit_high)
 
@@ -63,9 +63,12 @@ class Bot:
         return 'Изменения приняты'
 
     def get_history(self, user_id: int) -> str:
-        history = self.__db.get_history(user_id)
-        print(history)
-        return 'history'
+        history = [
+            i_command.replace('_', ' ')
+            for i_command in self.__db.get_history(user_id)
+        ]
+
+        return '<b>История команд:</b>\n(New)\n\t\t· ' + '\n\t\t· '.join(history) + '\n(Old)'
 
     def get_game_rating(self, user_id: int) -> str:
         self.__db.write_history(user_id=user_id, query_name='game_rating')

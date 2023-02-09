@@ -1,8 +1,9 @@
 import json
-import os
 from typing import Dict, List, Union
 
 import requests
+
+from config import API_KEY
 
 from utils.exponential_backoff import exponential_backoff
 
@@ -11,7 +12,7 @@ T_game = Dict[str, Union[str, int, float]]
 
 
 class API:
-    __key = os.getenv('API_KEY')
+    __key = API_KEY
 
     @exponential_backoff()
     def get(self) -> List[T_game] or any:

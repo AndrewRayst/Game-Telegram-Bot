@@ -1,8 +1,9 @@
-import os
 from typing import Dict, List, Union
 
 from aiogram import Bot as AIOBot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+
+from config import BOT_TOKEN
 
 from classes.api import API
 from classes.data_base import DataBase
@@ -31,7 +32,7 @@ class Bot:
     def __init__(self) -> None:
         storage = MemoryStorage()
 
-        self.__aioBot = AIOBot(token=os.getenv('BOT_TOKEN'))
+        self.__aioBot = AIOBot(token=BOT_TOKEN)
         self.dispatcher = Dispatcher(self.__aioBot, storage=storage)
         self.keyboard = KeyBoard(self, self.dispatcher)
         self.watcher = Watcher(self)

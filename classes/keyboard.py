@@ -1,5 +1,6 @@
 from aiogram import Dispatcher
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, \
+    ReplyKeyboardRemove
 
 from utils.emoji import emojize
 
@@ -31,5 +32,13 @@ class KeyBoard:
         return ReplyKeyboardMarkup(resize_keyboard=True)\
             .row(btn_low, btn_high).add(btn_custom).add(btn_back)
 
-    def remove(self) -> None:
+    @staticmethod
+    def get_rating_keyboard() -> InlineKeyboardMarkup:
+        btn_prev = InlineKeyboardButton(text='<-', callback_data='rating_prev')
+        btn_next = InlineKeyboardButton(text='->', callback_data='rating_next')
+
+        return InlineKeyboardMarkup(row_width=2).row(btn_prev, btn_next)
+
+    @staticmethod
+    def remove() -> None:
         ReplyKeyboardRemove()

@@ -1,5 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import Text
 
 from utils.emoji import demojize, emojize
 
@@ -59,7 +60,17 @@ class Watcher:
                     await msg.answer(self.bot.get_history(user_id), parse_mode=types.ParseMode.HTML)
 
                 case 'Game Rating':
-                    await msg.answer(self.bot.get_game_rating(user_id))
+                    error_msg = self.bot.get_game_rating(user_id)
+
+                    if error_msg:
+                        await msg.answer(error_msg)
+
+                    else:
+                        rating = self.bot.users_ratings[user_id]
+                        await msg.answer(
+                            text=rating.__str__(),
+                            reply_markup=self.bot.keyboard.get_rating_keyboard()
+                        )
 
                 case 'Low':
                     await msg.answer('Введите минимальный рейтинг:')
@@ -144,9 +155,27 @@ class Watcher:
             await state.finish()
             await msg.answer('Изменения приняты')
 
+    def watch_rating_cb(self):
+        @self.bot.dispatcher.callback_query_handler(Text(startswith="rating_"))
+        async def command(call: types.CallbackQuery) -> None:
+            rating = self.bot.users_ratings[call.from_user.id]
+
+            if call.data.endswith('_prev'):
+                rating.prev_part()
+
+            elif call.data.endswith('_next'):
+                rating.next_part()
+
+            if rating.__str__() != call.message.text:
+                await call.message.edit_text(
+                    text=rating.__str__(),
+                    reply_markup=self.bot.keyboard.get_rating_keyboard()
+                )
+
     def run(self):
         self.watch_commands()
         self.watch_keyboard()
         self.watch_low_cb()
         self.watch_high_cb()
         self.watch_custom_cb()
+        self.watch_rating_cb()

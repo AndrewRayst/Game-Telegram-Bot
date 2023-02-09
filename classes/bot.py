@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List, Union
 
 from aiogram import Bot as AIOBot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -8,6 +8,7 @@ from config import BOT_TOKEN
 from classes.api import API
 from classes.data_base import DataBase
 from classes.keyboard import KeyBoard
+from classes.rating import Rating
 from classes.states import States
 from classes.watcher import Watcher
 
@@ -23,6 +24,8 @@ class Bot:
         'high', 'custom', 'history',
         'game_rating', 'settings'
     ]
+
+    users_ratings: Dict[int, Rating] = dict()
 
     states = States
 
@@ -71,19 +74,40 @@ class Bot:
 
         return '<b>История команд:</b>\n(New)\n\t\t· ' + '\n\t\t· '.join(history) + '\n(Old)'
 
-    def get_game_rating(self, user_id: int) -> str:
+    def get_game_rating(self, user_id: int) -> Union[None, str]:
+        def check_rating(item: any) -> bool:
+            try:
+                rating = int(item['topCriticScore'])
+
+                if (rating < low_limit) or (rating > high_limit):
+                    return False
+
+                return True
+
+            except ValueError:
+                return False
+
         self.__db.write_history(user_id=user_id, query_name='game_rating')
-        # data = self.__api.get()
+        data = self.__api.get()
 
-        # print(self.__db.get_limits(user_id).low)
         low_limit, high_limit = self.__db.get_limits(user_id)
-        print(low_limit, high_limit)
 
-        # if data:
-        #     # print(list([(i_item['name'], i_item['topCriticScore']) for i_item in data]))
-        #     return 'rating'
+        if data:
+            data = list(filter(check_rating, data))
 
-        return 'Ошибка соединения'
+            if not data:
+                print(data)
+                return 'Игр с данным рейтингом нет'
+
+            data = sorted(data, key=lambda item: item['topCriticScore'], reverse=True)
+
+            for i_item in data:
+                i_item['topCriticScore'] = round(i_item['topCriticScore'], 2)
+
+            self.users_ratings[user_id] = Rating(arr=data)
+
+        else:
+            return 'Ошибка соединения, попробуйте снова'
 
     def run(self) -> None:
         async def on_startup(_: any) -> None:
